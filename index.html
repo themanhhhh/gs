@@ -7,111 +7,196 @@
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grand Luxury Tree - Cloud Edition</title>
     <style>
         /* 修改背景为深色渐变 */
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background: radial-gradient(circle at center, #0f2027 0%, #203a43 50%, #2c5364 100%); 
-            background-color: #050d1a; 
-            font-family: 'Times New Roman', serif; 
-            touch-action: none; /* 禁止浏览器默认的缩放和平移 */
-            user-select: none;  /* 禁止选中文字 */
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            background-color: #050d1a;
+            font-family: 'Times New Roman', serif;
+            touch-action: none;
+            /* 禁止浏览器默认的缩放和平移 */
+            user-select: none;
+            /* 禁止选中文字 */
             -webkit-user-select: none;
         }
-        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; cursor: grab; }
-        #canvas-container:active { cursor: grabbing; }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
 
         /* UI Overlay */
         #ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10; pointer-events: none;
-            display: flex; flex-direction: column; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             padding-top: 40px;
             box-sizing: border-box;
             transition: opacity 0.5s ease;
         }
-        
-        .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
+
+        .ui-hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
 
         /* Loading */
         #loader {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050d1a; z-index: 100;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050d1a;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             transition: opacity 0.8s ease-out;
         }
+
         .loader-text {
-            color: #d4af37; font-size: 14px; letter-spacing: 4px; margin-top: 20px;
-            text-transform: uppercase; font-weight: 100;
+            color: #d4af37;
+            font-size: 14px;
+            letter-spacing: 4px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            font-weight: 100;
         }
+
         .spinner {
-            width: 40px; height: 40px; border: 1px solid rgba(212, 175, 55, 0.2); 
-            border-top: 1px solid #d4af37; border-radius: 50%; 
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-top: 1px solid #d4af37;
+            border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         /* Typography */
-        h1 { 
-            color: #fceea7; font-size: 8vw; 
-            max-size: 56px; margin: 0; font-weight: 400; 
-            letter-spacing: 6px; 
-            text-shadow: 0 0 50px rgba(252, 238, 167, 0.6); 
+        h1 {
+            color: #fceea7;
+            font-size: 8vw;
+            max-size: 56px;
+            margin: 0;
+            font-weight: 400;
+            letter-spacing: 6px;
+            text-shadow: 0 0 50px rgba(252, 238, 167, 0.6);
             background: linear-gradient(to bottom, #fff, #eebb66);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-family: 'Be Vietnam Pro', 'Times New Roman', serif;
-            opacity: 0.9; transition: opacity 0.5s ease;
-            text-align: center; pointer-events: none;
+            opacity: 0.9;
+            transition: opacity 0.5s ease;
+            text-align: center;
+            pointer-events: none;
         }
-        @media (min-width: 768px) { h1 { font-size: 56px; } }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 56px;
+            }
+        }
 
         /* Controls */
         .controls-wrapper {
-            position: absolute; top: 100px; right: 20px;        
+            position: absolute;
+            top: 100px;
+            right: 20px;
             pointer-events: auto;
-            display: flex; flex-direction: column; align-items: flex-end;
-            gap: 10px; z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            z-index: 20;
             transition: opacity 0.5s ease;
         }
 
         .btn-group {
-            display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
         }
 
         .control-btn {
-            background: rgba(20, 20, 20, 0.6); 
-            border: 1px solid rgba(212, 175, 55, 0.4); 
-            color: #d4af37; padding: 10px 20px; 
-            cursor: pointer; text-transform: uppercase; 
-            letter-spacing: 2px; font-size: 10px;
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            padding: 10px 20px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 10px;
             transition: all 0.4s;
-            display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px); min-width: 120px;
-        }
-        
-        .control-btn.active {
-            background: rgba(212, 175, 55, 0.8); color: #000;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-        }
-        .control-btn:hover { 
-            background: #d4af37; color: #000; 
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-        }
-        
-        .hint-text {
-            color: rgba(212, 175, 55, 0.5); font-size: 9px;
-            letter-spacing: 1px; text-transform: uppercase;
-            text-align: right; margin-top: 5px; max-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            min-width: 120px;
         }
 
-        input[type="file"] { display: none; }
-/* //     <!--
+        .control-btn.active {
+            background: rgba(212, 175, 55, 0.8);
+            color: #000;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+        }
+
+        .control-btn:hover {
+            background: #d4af37;
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .hint-text {
+            color: rgba(212, 175, 55, 0.5);
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: right;
+            margin-top: 5px;
+            max-width: 200px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* //     <!--
 //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
 //   - @Author: wp/electronicminer qq:2013248845
 //   - @Date: 2025-12-07
@@ -120,54 +205,94 @@
 // --> */
         /* Mode Buttons (Bottom) - New for Touch */
         #mode-bar {
-            position: absolute; bottom: 30px; left: 50%;
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
             transform: translateX(-50%);
-            display: flex; gap: 15px;
-            z-index: 20; pointer-events: auto;
+            display: flex;
+            gap: 15px;
+            z-index: 20;
+            pointer-events: auto;
         }
+
         .mode-btn {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: rgba(0,0,0,0.6);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid #d4af37;
-            color: #d4af37; font-size: 20px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s;
+            color: #d4af37;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
             backdrop-filter: blur(4px);
         }
-        .mode-btn:active { transform: scale(0.9); background: #d4af37; color: #000; }
-        
+
+        .mode-btn:active {
+            transform: scale(0.9);
+            background: #d4af37;
+            color: #000;
+        }
+
         /* Webcam feedback */
         #webcam-wrapper {
-            position: absolute; bottom: 100px; left: 20px;         
-            width: 120px; height: 90px;
-            border: 1px solid rgba(212, 175, 55, 0.5); 
-            box-shadow: 0 0 20px rgba(0,0,0,0.9);
-            border-radius: 4px; overflow: hidden; 
-            opacity: 0; pointer-events: none;
-            z-index: 50; background: #000;
-            transition: opacity 0.5s ease; 
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            width: 120px;
+            height: 90px;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+            border-radius: 4px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            background: #000;
+            transition: opacity 0.5s ease;
         }
-        #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
 
         #debug-info {
-            position: absolute; bottom: 5px; left: 5px;
-            color: rgba(212, 175, 55, 0.6); font-size: 10px;
-            font-family: monospace; pointer-events: none; z-index: 51;
-            width: 100%; text-align: center;
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            color: rgba(212, 175, 55, 0.6);
+            font-size: 10px;
+            font-family: monospace;
+            pointer-events: none;
+            z-index: 51;
+            width: 100%;
+            text-align: center;
         }
-        
+
         /* Message Box */
         #msg-box {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.9);
             border: 1px solid #d4af37;
-            padding: 20px; color: #d4af37;
-            z-index: 200; text-align: center;
-            display: none; border-radius: 8px; min-width: 200px;
+            padding: 20px;
+            color: #d4af37;
+            z-index: 200;
+            text-align: center;
+            display: none;
+            border-radius: 8px;
+            min-width: 200px;
         }
     </style>
-    
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap');
     </style>
@@ -182,41 +307,33 @@
         }
     </script>
 </head>
+
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <div class="loader-text">Loading Memories</div>
+        <div class="loader-text">Chờ xí</div>
     </div>
-    
+
     <div id="msg-box"></div>
 
     <div id="canvas-container"></div>
 
     <div id="ui-layer">
         <h1>Giáng sinh vui vẻ ( Đừng ngã nữa nha )</h1>
-        
+
         <div class="controls-wrapper">
             <div class="btn-group">
                 <div class="control-btn" id="cam-btn">📷 Enable Gesture</div>
-                <label class="control-btn">
-                    Select Local Folder
-                    <input type="file" id="folder-input" webkitdirectory directory multiple>
-                </label>
-                <label class="control-btn">
-                    Add Local Files
-                    <input type="file" id="file-input" multiple accept="image/*">
-                </label>
             </div>
-            <div class="hint-text">Cloud Images Loaded. Add local files if needed.</div>
         </div>
-    <!--
+        <!--
 //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
 //   - @Author: wp/electronicminer qq:2013248845
 //   - @Date: 2025-12-07
 //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
 //   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+// -->
         <!-- 触屏模式切换按钮 -->
         <div id="mode-bar">
             <div class="mode-btn" onclick="setMode('TREE')" title="Tree Mode">🎄</div>
@@ -235,46 +352,46 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'; 
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
         import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
         // --- 核心配置 ---
         const CONFIG = {
             colors: {
-                bg: 0x050d1a, 
+                bg: 0x050d1a,
                 fog: 0x050d1a,
-                champagneGold: 0xffd966, 
-                deepGreen: 0x03180a,     
-                accentRed: 0x990000,     
+                champagneGold: 0xffd966,
+                deepGreen: 0x03180a,
+                accentRed: 0x990000,
             },
             particles: {
-                count: 1500,     
-                dustCount: 2000, 
+                count: 1500,
+                dustCount: 2000,
                 snowCount: 1000,
-                treeHeight: 24,  
-                treeRadius: 8    
+                treeHeight: 24,
+                treeRadius: 8
             },
             camera: { z: 50 },
             preload: {
                 // 设置为 false 关闭本地自动扫描，因为我们现在使用云端图片
-                autoScanLocal: false, 
-                
+                autoScanLocal: true,
+
                 // 开启云端图片加载
                 useCloudImages: true,
-                
+
                 // --- 【在这里自定义您的云端图片链接】 ---
                 // 支持 .jpg, .png, .jpeg 等格式
                 cloudImageUrls: [
-                  
+
                     // 在这里添加更多链接，注意用逗号分隔，链接用引号包围
                 ],
-                scanCount: 200, 
+                scanCount: 200,
             }
         };
 
         const STATE = {
-            mode: 'TREE', 
-            focusIndex: -1, 
+            mode: 'TREE',
+            focusIndex: -1,
             focusTarget: null,
             hand: { detected: false, x: 0, y: 0 },
             rotation: { x: 0, y: 0 },
@@ -282,31 +399,31 @@
         };
 
         let scene, camera, renderer, composer;
-        let mainGroup; 
+        let mainGroup;
         let clock = new THREE.Clock();
-        let particleSystem = []; 
+        let particleSystem = [];
         let photoMeshGroup = new THREE.Group();
         let handLandmarker, video;
-        let caneTexture; 
+        let caneTexture;
         let snowSystem;
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
-        
+
         const debugInfo = document.getElementById('debug-info');
         const camBtn = document.getElementById('cam-btn');
         let isCameraRunning = false;
 
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         window.setMode = (mode) => {
             if (mode === 'FOCUS_RANDOM') {
                 STATE.mode = 'FOCUS';
                 const photos = particleSystem.filter(p => p.type === 'PHOTO');
-                if (photos.length) STATE.focusTarget = photos[Math.floor(Math.random()*photos.length)].mesh;
+                if (photos.length) STATE.focusTarget = photos[Math.floor(Math.random() * photos.length)].mesh;
             } else {
                 STATE.mode = mode;
                 if (mode === 'TREE') STATE.focusTarget = null;
@@ -315,17 +432,17 @@
 
         async function init() {
             initThree();
-            setupEnvironment(); 
+            setupEnvironment();
             setupLights();
             createTextures();
-            createParticles(); 
+            createParticles();
             createDust();
             createSnow();
             loadPredefinedImages(); // 这里的逻辑已更新，支持云图片
             setupPostProcessing();
             setupEvents();
-            setupTouchAndClick(); 
-            
+            setupTouchAndClick();
+
             const loader = document.getElementById('loader');
             loader.style.opacity = 0;
             setTimeout(() => loader.remove(), 800);
@@ -336,7 +453,7 @@
         // --- 触屏与点击逻辑 (Raycaster) ---
         function setupTouchAndClick() {
             const container = document.getElementById('canvas-container');
-            
+
             container.addEventListener('pointerdown', (e) => {
                 STATE.touch.active = true;
                 STATE.touch.startX = e.clientX;
@@ -362,7 +479,7 @@
 
             container.addEventListener('click', (e) => {
                 const moveDist = Math.hypot(e.clientX - STATE.touch.startX, e.clientY - STATE.touch.startY);
-                if (moveDist > 10) return; 
+                if (moveDist > 10) return;
 
                 mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
                 mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -373,7 +490,7 @@
                 let clickedPhoto = null;
                 for (let hit of intersects) {
                     let obj = hit.object;
-                    while(obj.parent && obj.parent !== mainGroup && obj.parent !== photoMeshGroup) {
+                    while (obj.parent && obj.parent !== mainGroup && obj.parent !== photoMeshGroup) {
                         obj = obj.parent;
                     }
                     const particle = particleSystem.find(p => p.mesh === obj && p.type === 'PHOTO');
@@ -405,12 +522,12 @@
                 lastTap = currentTime;
             });
         }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         // --- 核心 Three.js 逻辑 ---
         function initThree() {
             const container = document.getElementById('canvas-container');
@@ -419,13 +536,13 @@
             scene.fog = new THREE.FogExp2(CONFIG.colors.fog, 0.015);
 
             camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, CONFIG.camera.z); 
+            camera.position.set(0, 2, CONFIG.camera.z);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.toneMapping = THREE.ReinhardToneMapping; 
-            renderer.toneMappingExposure = 2.2; 
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+            renderer.toneMappingExposure = 2.2;
             container.appendChild(renderer.domElement);
 
             mainGroup = new THREE.Group();
@@ -438,7 +555,7 @@
         }
 
         function setupLights() {
-            const ambient = new THREE.AmbientLight(0xffffff, 0.6); 
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambient);
             const innerLight = new THREE.PointLight(0xffaa00, 2, 20);
             innerLight.position.set(0, 5, 0);
@@ -446,7 +563,7 @@
             const spotGold = new THREE.SpotLight(0xffcc66, 1200);
             spotGold.position.set(30, 40, 40); spotGold.angle = 0.5; spotGold.penumbra = 0.5;
             scene.add(spotGold);
-            const spotBlue = new THREE.SpotLight(0x6688ff, 800); 
+            const spotBlue = new THREE.SpotLight(0x6688ff, 800);
             spotBlue.position.set(-30, 20, -30);
             scene.add(spotBlue);
             const fill = new THREE.DirectionalLight(0xffeebb, 0.8);
@@ -467,22 +584,22 @@
             const canvas = document.createElement('canvas');
             canvas.width = 128; canvas.height = 128;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,128,128);
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 128, 128);
             ctx.fillStyle = '#880000'; ctx.beginPath();
-            for(let i=-128; i<256; i+=32) {
-                ctx.moveTo(i, 0); ctx.lineTo(i+32, 128); ctx.lineTo(i+16, 128); ctx.lineTo(i-16, 0);
+            for (let i = -128; i < 256; i += 32) {
+                ctx.moveTo(i, 0); ctx.lineTo(i + 32, 128); ctx.lineTo(i + 16, 128); ctx.lineTo(i - 16, 0);
             }
             ctx.fill();
             caneTexture = new THREE.CanvasTexture(canvas);
             caneTexture.wrapS = THREE.RepeatWrapping; caneTexture.wrapT = THREE.RepeatWrapping;
             caneTexture.repeat.set(3, 3);
         }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         // --- 粒子与图片系统 ---
         function createSnow() {
             const geometry = new THREE.BufferGeometry();
@@ -529,28 +646,28 @@
             constructor(mesh, type, isDust = false) {
                 this.mesh = mesh; this.type = type; this.isDust = isDust;
                 this.posTree = new THREE.Vector3(); this.posScatter = new THREE.Vector3();
-                this.baseScale = mesh.scale.x; 
+                this.baseScale = mesh.scale.x;
                 const speedMult = (type === 'PHOTO') ? 0.3 : 2.0;
-                this.spinSpeed = new THREE.Vector3((Math.random()-0.5)*speedMult, (Math.random()-0.5)*speedMult, (Math.random()-0.5)*speedMult);
+                this.spinSpeed = new THREE.Vector3((Math.random() - 0.5) * speedMult, (Math.random() - 0.5) * speedMult, (Math.random() - 0.5) * speedMult);
                 this.calculatePositions();
             }
             calculatePositions() {
                 if (this.type === 'PHOTO') {
-                    this.posTree.set(0, 0, 0); 
-                    const rScatter = 8 + Math.random()*12;
+                    this.posTree.set(0, 0, 0);
+                    const rScatter = 8 + Math.random() * 12;
                     const theta = Math.random() * Math.PI * 2;
                     const phi = Math.acos(2 * Math.random() - 1);
                     this.posScatter.set(rScatter * Math.sin(phi) * Math.cos(theta), rScatter * Math.sin(phi) * Math.sin(theta), rScatter * Math.cos(phi));
                     return;
                 }
                 const h = CONFIG.particles.treeHeight;
-                let t = Math.pow(Math.random(), 0.8); 
+                let t = Math.pow(Math.random(), 0.8);
                 const y = (t * h) - (h / 2);
                 let rMax = Math.max(0.5, CONFIG.particles.treeRadius * (1.0 - t));
-                const angle = t * 50 * Math.PI + Math.random() * Math.PI; 
-                const r = rMax * (0.8 + Math.random() * 0.4); 
+                const angle = t * 50 * Math.PI + Math.random() * Math.PI;
+                const r = rMax * (0.8 + Math.random() * 0.4);
                 this.posTree.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
-                let rScatter = this.isDust ? (12 + Math.random()*20) : (8 + Math.random()*12);
+                let rScatter = this.isDust ? (12 + Math.random() * 20) : (8 + Math.random() * 12);
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
                 this.posScatter.set(rScatter * Math.sin(phi) * Math.cos(theta), rScatter * Math.sin(phi) * Math.sin(theta), rScatter * Math.cos(phi));
@@ -564,18 +681,18 @@
                         target = desiredWorldPos.applyMatrix4(invMatrix);
                     } else target = this.posScatter;
                 }
-                const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 5.0 : 2.0; 
+                const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 5.0 : 2.0;
                 this.mesh.position.lerp(target, lerpSpeed * dt);
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+                //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+                //   - @Author: wp/electronicminer qq:2013248845
+                //   - @Date: 2025-12-07
+                //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+                //   - 如需使用或分发，请务必保留此作者声明。
+                // --> 
                 if (mode === 'SCATTER') {
                     this.mesh.rotation.x += this.spinSpeed.x * dt;
                     this.mesh.rotation.y += this.spinSpeed.y * dt;
-                    this.mesh.rotation.z += this.spinSpeed.z * dt; 
+                    this.mesh.rotation.z += this.spinSpeed.z * dt;
                 } else if (mode === 'TREE') {
                     if (this.type === 'PHOTO') {
                         this.mesh.lookAt(0, this.mesh.position.y, 0);
@@ -583,20 +700,20 @@
                     } else {
                         this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
                         this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
-                        this.mesh.rotation.y += 0.5 * dt; 
+                        this.mesh.rotation.y += 0.5 * dt;
                     }
                 }
-                if (mode === 'FOCUS' && this.mesh === focusTargetMesh) this.mesh.lookAt(camera.position); 
+                if (mode === 'FOCUS' && this.mesh === focusTargetMesh) this.mesh.lookAt(camera.position);
 
                 let s = this.baseScale;
                 if (this.isDust) {
                     s = this.baseScale * (0.8 + 0.4 * Math.sin(clock.elapsedTime * 4 + this.mesh.id));
-                    if (mode === 'TREE') s = 0; 
-                } else if (mode === 'SCATTER' && this.type === 'PHOTO') s = this.baseScale * 2.5; 
+                    if (mode === 'TREE') s = 0;
+                } else if (mode === 'SCATTER' && this.type === 'PHOTO') s = this.baseScale * 2.5;
                 else if (mode === 'FOCUS') {
-                    if (this.mesh === focusTargetMesh) s = 4.5; else s = this.baseScale * 0.8; 
+                    if (this.mesh === focusTargetMesh) s = 4.5; else s = this.baseScale * 0.8;
                 }
-                this.mesh.scale.lerp(new THREE.Vector3(s,s,s), 4*dt);
+                this.mesh.scale.lerp(new THREE.Vector3(s, s, s), 4 * dt);
             }
         }
 
@@ -605,31 +722,31 @@
             const count = photos.length;
             if (count === 0) return;
             const h = CONFIG.particles.treeHeight * 0.9;
-            const bottomY = -h/2; const stepY = h / count; const loops = 3;
+            const bottomY = -h / 2; const stepY = h / count; const loops = 3;
             photos.forEach((p, i) => {
-                const y = bottomY + stepY * i + stepY/2;
-                const normalizedH = (y + h/2) / CONFIG.particles.treeHeight; 
-                const r = Math.max(1.0, CONFIG.particles.treeRadius * (1.0 - normalizedH)) + 3.0; 
-                const angle = normalizedH * Math.PI * 2 * loops + (Math.PI/4); 
+                const y = bottomY + stepY * i + stepY / 2;
+                const normalizedH = (y + h / 2) / CONFIG.particles.treeHeight;
+                const r = Math.max(1.0, CONFIG.particles.treeRadius * (1.0 - normalizedH)) + 3.0;
+                const angle = normalizedH * Math.PI * 2 * loops + (Math.PI / 4);
                 p.posTree.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
             });
         }
 
         function createParticles() {
-            const sphereGeo = new THREE.SphereGeometry(0.5, 32, 32); 
-            const boxGeo = new THREE.BoxGeometry(0.55, 0.55, 0.55); 
+            const sphereGeo = new THREE.SphereGeometry(0.5, 32, 32);
+            const boxGeo = new THREE.BoxGeometry(0.55, 0.55, 0.55);
             const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, -0.5, 0), new THREE.Vector3(0, 0.3, 0), new THREE.Vector3(0.1, 0.5, 0), new THREE.Vector3(0.3, 0.4, 0)]);
             const candyGeo = new THREE.TubeGeometry(curve, 16, 0.08, 8, false);
             const goldMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.champagneGold, metalness: 1.0, roughness: 0.1, envMapIntensity: 2.0, emissive: 0x443300, emissiveIntensity: 0.3 });
             const greenMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.deepGreen, metalness: 0.2, roughness: 0.8, emissive: 0x002200, emissiveIntensity: 0.2 });
             const redMat = new THREE.MeshPhysicalMaterial({ color: CONFIG.colors.accentRed, metalness: 0.3, roughness: 0.2, clearcoat: 1.0, emissive: 0x330000 });
             const candyMat = new THREE.MeshStandardMaterial({ map: caneTexture, roughness: 0.4 });
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+            //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+            //   - @Author: wp/electronicminer qq:2013248845
+            //   - @Date: 2025-12-07
+            //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+            //   - 如需使用或分发，请务必保留此作者声明。
+            // --> 
             for (let i = 0; i < CONFIG.particles.count; i++) {
                 const rand = Math.random();
                 let mesh, type;
@@ -639,7 +756,7 @@
                 else if (rand < 0.97) { mesh = new THREE.Mesh(sphereGeo, redMat); type = 'RED'; }
                 else { mesh = new THREE.Mesh(candyGeo, candyMat); type = 'CANE'; }
                 const s = 0.4 + Math.random() * 0.5;
-                mesh.scale.set(s,s,s); mesh.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
+                mesh.scale.set(s, s, s); mesh.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
                 mainGroup.add(mesh);
                 particleSystem.push(new Particle(mesh, type, false));
             }
@@ -654,10 +771,10 @@
             }
             starShape.closePath();
             const starGeo = new THREE.ExtrudeGeometry(starShape, { depth: 0.4, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1, bevelSegments: 2 });
-            starGeo.center(); 
+            starGeo.center();
             const starMat = new THREE.MeshStandardMaterial({ color: 0xffdd88, emissive: 0xffaa00, emissiveIntensity: 1.0, metalness: 1.0, roughness: 0 });
             const star = new THREE.Mesh(starGeo, starMat);
-            star.position.set(0, CONFIG.particles.treeHeight/2 + 1.2, 0);
+            star.position.set(0, CONFIG.particles.treeHeight / 2 + 1.2, 0);
             mainGroup.add(star);
             mainGroup.add(photoMeshGroup);
         }
@@ -665,11 +782,11 @@
         function createDust() {
             const geo = new THREE.TetrahedronGeometry(0.08, 0);
             const mat = new THREE.MeshBasicMaterial({ color: 0xffeebb, transparent: true, opacity: 0.8 });
-            for(let i=0; i<CONFIG.particles.dustCount; i++) {
-                 const mesh = new THREE.Mesh(geo, mat);
-                 mesh.scale.setScalar(0.5 + Math.random());
-                 mainGroup.add(mesh);
-                 particleSystem.push(new Particle(mesh, 'DUST', true));
+            for (let i = 0; i < CONFIG.particles.dustCount; i++) {
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.scale.setScalar(0.5 + Math.random());
+                mainGroup.add(mesh);
+                particleSystem.push(new Particle(mesh, 'DUST', true));
             }
         }
 
@@ -688,21 +805,21 @@
             photo.position.z = 0.04;
             const group = new THREE.Group();
             group.add(frame); group.add(photo);
-            frame.scale.set(width/1.2, height/1.2, 1);
-            const s = 0.8; group.scale.set(s,s,s);
+            frame.scale.set(width / 1.2, height / 1.2, 1);
+            const s = 0.8; group.scale.set(s, s, s);
             photoMeshGroup.add(group);
             particleSystem.push(new Particle(group, 'PHOTO', false));
             updatePhotoLayout();
         }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         function handleImageUpload(e) {
             const files = e.target.files;
-            if(!files.length) return;
+            if (!files.length) return;
             Array.from(files).forEach(f => {
                 if (!f.type.startsWith('image/')) return;
                 const reader = new FileReader();
@@ -715,10 +832,10 @@
                 reader.readAsDataURL(f);
             });
         }
-        
+
         function loadPredefinedImages() {
             const loader = new THREE.TextureLoader();
-            
+
             // 1. 优先加载配置的云端图片
             if (CONFIG.preload.useCloudImages && CONFIG.preload.cloudImageUrls.length > 0) {
                 CONFIG.preload.cloudImageUrls.forEach(url => {
@@ -742,7 +859,7 @@
                     const pathJpg = `./images/(${i}).jpg`;
                     const pathPng = `./images/(${i}).png`;
                     loader.load(pathJpg, (t) => { t.colorSpace = THREE.SRGBColorSpace; addPhotoToScene(t); }, undefined, () => {
-                             loader.load(pathPng, (t) => { t.colorSpace = THREE.SRGBColorSpace; addPhotoToScene(t); }, undefined, () => {} );
+                        loader.load(pathPng, (t) => { t.colorSpace = THREE.SRGBColorSpace; addPhotoToScene(t); }, undefined, () => { });
                     });
                 }
             }
@@ -754,12 +871,12 @@
             box.innerText = txt; box.style.display = 'block';
             setTimeout(() => { box.style.display = 'none'; }, 3000);
         }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         async function initMediaPipe() {
             if (isCameraRunning) return;
             camBtn.innerText = "Initializing...";
@@ -780,7 +897,7 @@
                 camBtn.innerText = "Gesture Active";
                 camBtn.classList.add('active');
                 isCameraRunning = true;
-            } catch(e) {
+            } catch (e) {
                 console.warn("Camera error:", e);
                 let msg = "Camera Error: " + e.name;
                 if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') msg = "Please allow camera access!";
@@ -806,16 +923,16 @@
             if (result.landmarks && result.landmarks.length > 0) {
                 STATE.hand.detected = true;
                 const lm = result.landmarks[0];
-                STATE.hand.x = (lm[9].x - 0.5) * 2; 
+                STATE.hand.x = (lm[9].x - 0.5) * 2;
                 STATE.hand.y = (lm[9].y - 0.5) * 2;
-                const wrist = lm[0]; const middleMCP = lm[9]; 
+                const wrist = lm[0]; const middleMCP = lm[9];
                 const handSize = Math.hypot(middleMCP.x - wrist.x, middleMCP.y - wrist.y);
                 if (handSize < 0.02) return;
                 const tips = [lm[8], lm[12], lm[16], lm[20]];
                 let avgTipDist = 0; tips.forEach(t => avgTipDist += Math.hypot(t.x - wrist.x, t.y - wrist.y)); avgTipDist /= 4;
                 const pinchDist = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
                 const extensionRatio = avgTipDist / handSize; const pinchRatio = pinchDist / handSize;
-                
+
                 debugInfo.innerText = `Gesture Detected: ${STATE.mode}`;
 
                 if (extensionRatio < 1.5) { STATE.mode = 'TREE'; STATE.focusTarget = null; }
@@ -823,19 +940,19 @@
                     if (STATE.mode !== 'FOCUS') {
                         STATE.mode = 'FOCUS';
                         const photos = particleSystem.filter(p => p.type === 'PHOTO');
-                        if (photos.length) STATE.focusTarget = photos[Math.floor(Math.random()*photos.length)].mesh;
+                        if (photos.length) STATE.focusTarget = photos[Math.floor(Math.random() * photos.length)].mesh;
                     }
                 } else if (extensionRatio > 1.7) { STATE.mode = 'SCATTER'; STATE.focusTarget = null; }
             } else {
                 STATE.hand.detected = false;
             }
         }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         function setupEvents() {
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -851,7 +968,7 @@
                     const controls = document.querySelector('.controls-wrapper');
                     if (controls) controls.classList.toggle('ui-hidden');
                     const webcam = document.getElementById('webcam-wrapper');
-                    if(webcam) webcam.classList.toggle('ui-hidden');
+                    if (webcam) webcam.classList.toggle('ui-hidden');
                 }
             });
         }
@@ -864,7 +981,7 @@
             if (STATE.hand.detected) {
                 // 手势控制
                 if (STATE.mode === 'SCATTER') {
-                    const targetRotY = STATE.hand.x * Math.PI * 0.9; 
+                    const targetRotY = STATE.hand.x * Math.PI * 0.9;
                     const targetRotX = STATE.hand.y * Math.PI * 0.25;
                     STATE.rotation.y += (targetRotY - STATE.rotation.y) * 3.0 * dt;
                     STATE.rotation.x += (targetRotX - STATE.rotation.x) * 3.0 * dt;
@@ -875,19 +992,19 @@
                 // 触摸/鼠标拖动控制
             } else {
                 // 自动闲置动画
-                if(STATE.mode === 'TREE') {
+                if (STATE.mode === 'TREE') {
                     STATE.rotation.y += 0.3 * dt;
                     STATE.rotation.x += (0 - STATE.rotation.x) * 2.0 * dt;
                 } else {
-                    STATE.rotation.y += 0.1 * dt; 
+                    STATE.rotation.y += 0.1 * dt;
                 }
             }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+            //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+            //   - @Author: wp/electronicminer qq:2013248845
+            //   - @Date: 2025-12-07
+            //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+            //   - 如需使用或分发，请务必保留此作者声明。
+            // --> 
             mainGroup.rotation.y = STATE.rotation.y;
             mainGroup.rotation.x = STATE.rotation.x;
 
@@ -895,12 +1012,12 @@
             updateSnow();
             composer.render();
         }
-//   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
-//   - @Author: wp/electronicminer qq:2013248845
-//   - @Date: 2025-12-07
-//   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
-//   - 如需使用或分发，请务必保留此作者声明。
-// --> 
+        //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
+        //   - @Author: wp/electronicminer qq:2013248845
+        //   - @Date: 2025-12-07
+        //   - @Description: 3D Christmas tree with dual control: AI Hand Gestures + Touch/Mouse Interaction.
+        //   - 如需使用或分发，请务必保留此作者声明。
+        // --> 
         init();
     </script>
 </body>
