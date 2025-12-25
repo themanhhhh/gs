@@ -326,6 +326,7 @@
             <div class="btn-group">
                 <div class="control-btn" id="cam-btn">📷 Enable Gesture</div>
             </div>
+            <div class="hint-text">Cloud Images Loaded. Add local files if needed.</div>
         </div>
         <!--
 //   - @Project: Grand Luxury Tree - Christmas Edition (Touch & Gesture)
@@ -960,9 +961,11 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 composer.setSize(window.innerWidth, window.innerHeight);
             });
-            document.getElementById('file-input').addEventListener('change', handleImageUpload);
-            document.getElementById('folder-input').addEventListener('change', handleImageUpload);
-            camBtn.addEventListener('click', () => { initMediaPipe(); });
+            const fileInput = document.getElementById('file-input');
+            const folderInput = document.getElementById('folder-input');
+            if (fileInput) fileInput.addEventListener('change', handleImageUpload);
+            if (folderInput) folderInput.addEventListener('change', handleImageUpload);
+            if (camBtn) camBtn.addEventListener('click', () => { initMediaPipe(); });
             window.addEventListener('keydown', (e) => {
                 if (e.key.toLowerCase() === 'h') {
                     const controls = document.querySelector('.controls-wrapper');
